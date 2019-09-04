@@ -13,7 +13,7 @@ class BlogCategoriesTableSeeder extends Seeder
     {
         $categories =[];
 
-        $cName = 'Without category';
+        $cName = 'Without categories';
         $categories[] = [
             'title'     => $cName,
             'slug'      => Str::slug($cName),
