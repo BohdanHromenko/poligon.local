@@ -65,9 +65,6 @@ class CategoryController extends BaseController
      */
     public function update(BlogCategoryUpdateRequest $request, $id)
     {
-
-//        $validatedData = $this->validate($request, $rules);
-
         $item = BlogCategory::find($id);
         if (empty($item)) {
             return back()
