@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Blog\Admin;
 
+use App\Http\Requests\BlogPostUpdateRequest;
 use App\Repositories\BlogCategoryRepository;
 use App\Repositories\BlogPostRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 
@@ -98,9 +100,36 @@ class PostController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BlogPostUpdateRequest $request, $id)
     {
-        dd(__METHOD__, $request->all(), $id, "Update");
+        $item = $this->blogPostRepository->getEdit($id);
+
+        if (empty($item)) {
+            return back()
+                ->withErrors(['msg' => "Articel id=[{$id}] nor found"])
+                ->withInput();
+        }
+
+        $data = $request->all();
+
+        if (empty($data['slug'])) {
+            $data['slug'] = \Str::slug($data['title']);
+        }
+        if (empty($item->published_at) && $data['is_published']) {
+            $data['published_at'] = Carbon::now();
+        }
+
+        $result = $item->update($data);
+
+        if ($result) {
+            return redirect()
+                ->route('blog.admin.posts.edit', $item->id)
+                ->with(['success' => 'Saved successfully']);
+        } else {
+            return back()
+                ->withErrors(['msg' => 'Save error'])
+                ->withInput();
+        }
     }
 
     /**
